@@ -9,8 +9,8 @@ import org.neo4j.driver.v1.Transaction;
 
 import java.io.IOException;
 
-public class AddMovie implements HttpHandler {
-    public AddMovie(){}
+public class AddDirectorRelationship implements HttpHandler {
+    public AddDirectorRelationship() {}
 
     public void handle(HttpExchange r) {
         try {
@@ -31,14 +31,14 @@ public class AddMovie implements HttpHandler {
         // get the deserialized JSON
         JSONObject deserialized = new JSONObject(body);
 
-        // variables to hold the HTTP status code, the name and movieId of the movie
+        // variables to hold the HTTP status code, and the ID of the director and the movie
         int statusCode = 0;
-        String movieName = "";
+        String directorId = "";
         String movieId = "";
 
         // check if the required information is present in the body. If not, raise error 400
-        if (deserialized.has("name"))
-            movieName = deserialized.getString("name");
+        if (deserialized.has("directorId"))
+            directorId = deserialized.getString("directorId");
         else
             statusCode = 400;
 
@@ -48,22 +48,23 @@ public class AddMovie implements HttpHandler {
             statusCode = 400;
 
         try (Transaction tx = Utils.driver.session().beginTransaction()) {
-            // check if there is any data with the same actorId
-            StatementResult result = tx.run("MATCH (m:Movie {movieId: $movieId}) RETURN m",
-                    org.neo4j.driver.v1.Values.parameters("movieId", movieId));
+            // check if there is any existing relationship between directorId and movieId
+            StatementResult result = tx.run("MATCH (d:Director {directorId: $directorId})-[r:DIRECTED]->(m:Movie {movieId: $movieId}) " +
+                    "RETURN r", org.neo4j.driver.v1.Values.parameters("directorId", directorId, "movieId", movieId));
 
             // check for duplicate entries
             if (result.hasNext()) {
                 statusCode = 400;
             } else {
                 // make the query
-                tx.run("CREATE (m:Movie {name:$name, movieId:$movieId})",
-                        org.neo4j.driver.v1.Values.parameters("name", movieName, "movieId", movieId));
+                tx.run("MATCH (d:DIRECTOR {directorId: $directorId}), (m:Movie {movieId: $movieId}) " +
+                                "CREATE (d)-[r:DIRECTED]->(m)",
+                        org.neo4j.driver.v1.Values.parameters("directorId", directorId, "movieId", movieId));
 
                 // commit the query for persistence
                 tx.success();
 
-                System.out.println("Movie added: " + movieName);
+                System.out.println("Director Relation added");
                 statusCode = 200;
             }
         } catch (Exception e) {

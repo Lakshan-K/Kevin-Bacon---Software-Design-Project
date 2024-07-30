@@ -9,14 +9,15 @@ import org.neo4j.driver.v1.Transaction;
 
 import java.io.IOException;
 
-public class AddMovie implements HttpHandler {
-    public AddMovie(){}
+public class AddDirector implements HttpHandler {
+    public AddDirector() {
+    }
 
     public void handle(HttpExchange r) {
         try {
             if (r.getRequestMethod().equals("PUT")) {
                 handlePut(r);
-            }else{
+            } else {
                 r.sendResponseHeaders(404, -1);
             }
         } catch (Exception e) {
@@ -31,39 +32,39 @@ public class AddMovie implements HttpHandler {
         // get the deserialized JSON
         JSONObject deserialized = new JSONObject(body);
 
-        // variables to hold the HTTP status code, the name and movieId of the movie
+        // variables to hold the HTTP status code, the name and directorId of the director
         int statusCode = 0;
-        String movieName = "";
-        String movieId = "";
+        String directorName = "";
+        String directorId = "";
 
         // check if the required information is present in the body. If not, raise error 400
         if (deserialized.has("name"))
-            movieName = deserialized.getString("name");
+            directorName = deserialized.getString("name");
         else
             statusCode = 400;
 
-        if (deserialized.has("movieId"))
-            movieId = deserialized.getString("movieId");
+        if (deserialized.has("directorId"))
+            directorId = deserialized.getString("directorId");
         else
             statusCode = 400;
 
         try (Transaction tx = Utils.driver.session().beginTransaction()) {
-            // check if there is any data with the same actorId
-            StatementResult result = tx.run("MATCH (m:Movie {movieId: $movieId}) RETURN m",
-                    org.neo4j.driver.v1.Values.parameters("movieId", movieId));
+            // check if there is any data with the same directorId
+            StatementResult result = tx.run("MATCH (d:Director {directorId: $directorId}) RETURN d",
+                    org.neo4j.driver.v1.Values.parameters("directorId", directorId));
 
             // check for duplicate entries
             if (result.hasNext()) {
                 statusCode = 400;
             } else {
                 // make the query
-                tx.run("CREATE (m:Movie {name:$name, movieId:$movieId})",
-                        org.neo4j.driver.v1.Values.parameters("name", movieName, "movieId", movieId));
+                tx.run("CREATE (d:Director {name: $directorName, directorId: $directorId})",
+                        org.neo4j.driver.v1.Values.parameters("directorName", directorName, "directorId", directorId));
 
                 // commit the query for persistence
                 tx.success();
 
-                System.out.println("Movie added: " + movieName);
+                System.out.println("Director added: " + directorName);
                 statusCode = 200;
             }
         } catch (Exception e) {

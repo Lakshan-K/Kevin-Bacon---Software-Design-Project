@@ -31,7 +31,7 @@ public class AddRelationship implements HttpHandler {
         // get the deserialized JSON
         JSONObject deserialized = new JSONObject(body);
 
-        // variables to hold the HTTP status code, the name and actorID of the actor
+        // variables to hold the HTTP status code and the ID for actor and movie
         int statusCode = 0;
         String actorId = "";
         String movieId = "";

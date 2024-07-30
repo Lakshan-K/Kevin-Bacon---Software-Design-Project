@@ -9,8 +9,8 @@ import org.neo4j.driver.v1.Transaction;
 
 import java.io.IOException;
 
-public class AddMovie implements HttpHandler {
-    public AddMovie(){}
+public class AddCoActorRelationship implements HttpHandler {
+    public AddCoActorRelationship() {}
 
     public void handle(HttpExchange r) {
         try {
@@ -31,39 +31,40 @@ public class AddMovie implements HttpHandler {
         // get the deserialized JSON
         JSONObject deserialized = new JSONObject(body);
 
-        // variables to hold the HTTP status code, the name and movieId of the movie
+        // variables to hold the HTTP status code, and the ID of actor and co-actor
         int statusCode = 0;
-        String movieName = "";
-        String movieId = "";
+        String actorId = "";
+        String coActorId = "";
 
         // check if the required information is present in the body. If not, raise error 400
-        if (deserialized.has("name"))
-            movieName = deserialized.getString("name");
+        if (deserialized.has("actorId"))
+            actorId = deserialized.getString("actorId");
         else
             statusCode = 400;
 
-        if (deserialized.has("movieId"))
-            movieId = deserialized.getString("movieId");
+        if (deserialized.has("coActorId"))
+            coActorId = deserialized.getString("coActorId");
         else
             statusCode = 400;
 
         try (Transaction tx = Utils.driver.session().beginTransaction()) {
-            // check if there is any data with the same actorId
-            StatementResult result = tx.run("MATCH (m:Movie {movieId: $movieId}) RETURN m",
-                    org.neo4j.driver.v1.Values.parameters("movieId", movieId));
+            // check if there is any existing relationship between actorId and coActorId
+            StatementResult result = tx.run("MATCH (a:Actor {actorId: $actorId})-[r:ACTED_WITH]->(b:Actor {actorId: $coActorId}) " +
+                    "RETURN r", org.neo4j.driver.v1.Values.parameters("actorId", actorId, "coActorId", coActorId));
 
             // check for duplicate entries
             if (result.hasNext()) {
                 statusCode = 400;
             } else {
                 // make the query
-                tx.run("CREATE (m:Movie {name:$name, movieId:$movieId})",
-                        org.neo4j.driver.v1.Values.parameters("name", movieName, "movieId", movieId));
+                tx.run("MATCH (a:Actor {actorId: $actorId}), (b:Actor {actorId: $coActorId}) " +
+                                "CREATE (a)-[r:ACTED_WITH]->(b)",
+                        org.neo4j.driver.v1.Values.parameters("actorId", actorId, "coActorId", coActorId));
 
                 // commit the query for persistence
                 tx.success();
 
-                System.out.println("Movie added: " + movieName);
+                System.out.println("CoActor Relation added");
                 statusCode = 200;
             }
         } catch (Exception e) {
