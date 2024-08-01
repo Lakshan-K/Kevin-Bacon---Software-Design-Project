@@ -57,7 +57,7 @@ public class AddDirectorRelationship implements HttpHandler {
                 statusCode = 400;
             } else {
                 // make the query
-                tx.run("MATCH (d:DIRECTOR {directorId: $directorId}), (m:Movie {movieId: $movieId}) " +
+                tx.run("MATCH (d:Director {directorId: $directorId}), (m:Movie {movieId: $movieId}) " +
                                 "CREATE (d)-[r:DIRECTED]->(m)",
                         org.neo4j.driver.v1.Values.parameters("directorId", directorId, "movieId", movieId));
 
