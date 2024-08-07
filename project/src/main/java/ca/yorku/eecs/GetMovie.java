@@ -11,23 +11,19 @@ import org.neo4j.driver.v1.Transaction;
 
 import java.io.IOException;
 
-public class GetActor implements HttpHandler {
+public class GetMovie implements HttpHandler {
 
-    // Constructor for GetActor handler
-    public GetActor() {
-        System.out.println("GetActor handler initialized");
+    public GetMovie() {
+        System.out.println("GetMovie handler initialized");
     }
 
-    // Handle method to manage incoming HTTP requests
     public void handle(HttpExchange r) {
         try {
             System.out.println("Handling request: " + r.getRequestMethod());
-            // Check if the request method is GET
             if (r.getRequestMethod().equals("GET")) {
-                handleGet(r);  // Process the GET request
+                handleGet(r);
             } else {
-                // Respond with 404 if the method is not GET
-                r.sendResponseHeaders(404, -1);
+                r.sendResponseHeaders(404, -1); // Respond with 404 if it's not a GET request
                 r.getResponseBody().close();
             }
         } catch (Exception e) {
@@ -35,53 +31,49 @@ public class GetActor implements HttpHandler {
         }
     }
 
-    // Method to handle GET requests
     public void handleGet(HttpExchange r) throws IOException, JSONException {
         System.out.println("Processing GET request");
-
-        // Convert the request body to a String
+        // Convert the request body to a string
         String body = Utils.convert(r.getRequestBody());
         System.out.println("Request Body: " + body);
 
-        // Deserialize the request body into a JSON object
+        // Deserialize the JSON from the request body
         JSONObject deserialized = new JSONObject(body);
 
-        // Variables to hold the HTTP status code and actorID
+        // Initialize variables for the status code and movieId
         int statusCode = 0;
-        String actorId = "";
+        String movieId = "";
 
-        // Check if the actorId is present in the request body
-        if (deserialized.has("actorId")) {
-            actorId = deserialized.getString("actorId");
+        // Check if the movieId is present in the request body; if not, set status code to 400
+        if (deserialized.has("movieId")) {
+            movieId = deserialized.getString("movieId");
         } else {
-            // If actorId is missing, set status code to 400 (Bad Request)
             statusCode = 400;
         }
 
-        // Proceed if there are no errors so far
+        // If everything is okay so far, proceed to query the database
         if (statusCode == 0) {
-            // Start a transaction to query the database
             try (Transaction tx = Utils.driver.session().beginTransaction()) {
-                // Query to find the actor by actorId and get their details
-                StatementResult result = tx.run("MATCH (a:Actor {actorId: $actorId}) RETURN a.name AS name, " +
-                                "[ (a)-[:ACTED_IN]->(m:Movie) | m.movieId ] AS movies",
-                        org.neo4j.driver.v1.Values.parameters("actorId", actorId));
+                // Query to find the movie by movieId and get its details
+                StatementResult result = tx.run("MATCH (m:Movie {movieId: $movieId}) RETURN m.name AS name, " +
+                                "[ (m)<-[:ACTED_IN]-(a:Actor) | a.actorId ] AS actors",
+                        org.neo4j.driver.v1.Values.parameters("movieId", movieId));
 
                 System.out.println("Query executed. Checking result...");
 
-                // Check if the actor exists
+                // Check if the movie exists
                 if (result.hasNext()) {
                     System.out.println("Result hasNext: true");
                     Record record = result.next();
-                    // Get the actor's details
+                    // Retrieve the movie's details
                     String name = record.get("name").asString();
-                    JSONArray movies = new JSONArray(record.get("movies").asList());
+                    JSONArray actors = new JSONArray(record.get("actors").asList());
 
                     // Prepare the response JSON
                     JSONObject response = new JSONObject();
-                    response.put("actorId", actorId);
+                    response.put("movieId", movieId);
                     response.put("name", name);
-                    response.put("movies", movies);
+                    response.put("actors", actors);
 
                     // Send the response with a 200 status code
                     r.getResponseHeaders().add("Content-Type", "application/json");
@@ -91,14 +83,14 @@ public class GetActor implements HttpHandler {
                     return;
                 } else {
                     System.out.println("Result hasNext: false");
-                    // If the actor isn't found, set status code to 404 (Not Found)
+                    // If the movie isn't found, set status code to 404
                     statusCode = 404;
                 }
 
                 tx.success();
             } catch (Exception e) {
                 System.out.println("Exception: " + e);
-                // If there's an exception, set status code to 500 (Internal Server Error)
+                // If there's an exception, set status code to 500
                 statusCode = 500;
             }
         }

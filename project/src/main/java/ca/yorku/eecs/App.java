@@ -37,6 +37,9 @@ public class App {
         // Registering the context for GetActor handler
         server.createContext("/api/v1/getActor", new GetActor());
 
+        // Registering the context for GetMovie handler
+        server.createContext("/api/v1/getMovie", new GetMovie());
+
         // Starting the server
         server.start();
         System.out.printf("Server started on port %d...\n", PORT);
