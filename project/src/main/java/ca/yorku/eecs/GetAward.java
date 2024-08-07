@@ -10,6 +10,7 @@ import org.neo4j.driver.v1.StatementResult;
 import org.neo4j.driver.v1.Transaction;
 
 import java.io.IOException;
+import java.util.Map;
 
 public class GetAward implements HttpHandler {
 
@@ -62,8 +63,8 @@ public class GetAward implements HttpHandler {
             // Begin a transaction to query the Neo4j database
             try (Transaction tx = Utils.driver.session().beginTransaction()) {
                 // Query to find the award by awardId and return its name and the list of actors who won it
-                StatementResult result = tx.run("MATCH (w:Award {awardId: $awardId})<-[:WON]-(a:Actor) RETURN w.name AS name, " +
-                                "[ (a)-[:WON]->(w) | a.actorId ] AS actors",
+                StatementResult result = tx.run("MATCH (a:Actor)-[:HAS_AWARD]->(aw:Award {awardId: $awardId}) " +
+                                "RETURN aw.name AS awardName, aw.awardId AS awardId, collect({name: a.name, actorId: a.actorId}) AS actors",
                         org.neo4j.driver.v1.Values.parameters("awardId", awardId));
 
                 System.out.println("Query executed. Checking result...");
@@ -73,14 +74,21 @@ public class GetAward implements HttpHandler {
                     System.out.println("Result hasNext: true");
                     Record record = result.next();
                     // Retrieve the award's details from the query result
-                    String name = record.get("name").asString();
-                    JSONArray actors = new JSONArray(record.get("actors").asList());
+                    String name = record.get("awardName").asString();
+                    JSONArray actorsArray = new JSONArray();
+                    for (Object actorObj : record.get("actors").asList()) {
+                        Map<String, Object> actorMap = (Map<String, Object>) actorObj;
+                        JSONObject actorJson = new JSONObject();
+                        actorJson.put("actorName", actorMap.get("name").toString());
+                        actorJson.put("actorId", actorMap.get("actorId").toString());
+                        actorsArray.put(actorJson);
+                    }
 
                     // Prepare the JSON response with the award details
                     JSONObject response = new JSONObject();
                     response.put("awardId", awardId);
-                    response.put("name", name);
-                    response.put("actors", actors);
+                    response.put("awardName", name);
+                    response.put("actors", actorsArray);
 
                     // Send the response with status 200 (OK)
                     r.getResponseHeaders().add("Content-Type", "application/json");
@@ -108,3 +116,4 @@ public class GetAward implements HttpHandler {
         }
     }
 }
+

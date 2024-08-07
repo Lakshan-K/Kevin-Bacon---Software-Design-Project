@@ -67,16 +67,25 @@ public class AddAward implements HttpHandler {
                             org.neo4j.driver.v1.Values.parameters("awardName", awardName, "awardId", awardId));
                 }
 
-                // Added relationship creation between actor and award
-                tx.run("MATCH (a:Actor {actorId: $actorId}), (w:Award {awardId: $awardId}) " +
-                                "MERGE (a)-[:WON]->(w)",
-                        org.neo4j.driver.v1.Values.parameters("actorId", actorId, "awardId", awardId));
+                // Ensure the actor exists
+                StatementResult actorResult = tx.run("MATCH (a:Actor {actorId: $actorId}) RETURN a",
+                        org.neo4j.driver.v1.Values.parameters("actorId", actorId));
 
-                // Commit the query for persistence
-                tx.success();
+                if (!actorResult.hasNext()) {
+                    // If the actor does not exist, respond with 400 (Bad Request)
+                    statusCode = 400;
+                } else {
+                    // Added relationship creation between actor and award
+                    tx.run("MATCH (a:Actor {actorId: $actorId}), (w:Award {awardId: $awardId}) " +
+                                    "MERGE (a)-[:HAS_AWARD]->(w)",
+                            org.neo4j.driver.v1.Values.parameters("actorId", actorId, "awardId", awardId));
 
-                System.out.println("Award added: " + awardName + " to actor: " + actorId);
-                statusCode = 200;
+                    // Commit the query for persistence
+                    tx.success();
+
+                    System.out.println("Award added: " + awardName + " to actor: " + actorId);
+                    statusCode = 200;
+                }
             } catch (Exception e) {
                 System.out.println("Exception: " + e);
                 statusCode = 500;
