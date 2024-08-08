@@ -20,7 +20,7 @@ public class AddAward implements HttpHandler {
                 r.sendResponseHeaders(404, -1);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e);
         }
     }
 
@@ -35,7 +35,6 @@ public class AddAward implements HttpHandler {
         int statusCode = 0;
         String awardName = "";
         String awardId = "";
-        String actorId = "";  // Added actorId to link awards with actors
 
         // Check if the required information is present in the body. If not, raise error 400
         if (deserialized.has("name"))
@@ -48,12 +47,6 @@ public class AddAward implements HttpHandler {
         else
             statusCode = 400;
 
-        // Added check for actorId to create relationships
-        if (deserialized.has("actorId"))
-            actorId = deserialized.getString("actorId");
-        else
-            statusCode = 400;
-
         if (statusCode == 0) {
             try (Transaction tx = Utils.driver.session().beginTransaction()) {
                 // Check if there is any data with the same awardId
@@ -61,33 +54,19 @@ public class AddAward implements HttpHandler {
                         org.neo4j.driver.v1.Values.parameters("awardId", awardId));
 
                 // Check for duplicate entries
-                if (!result.hasNext()) {
-                    // Create the award if it does not exist
+                if(result.hasNext()) {
+                    // duplicate entry detected
+                    statusCode = 400;
+                } else {
+                    // make the query
                     tx.run("CREATE (w:Award {name: $awardName, awardId: $awardId})",
                             org.neo4j.driver.v1.Values.parameters("awardName", awardName, "awardId", awardId));
 
-                    // Ensure the actor exists
-                    StatementResult actorResult = tx.run("MATCH (a:Actor {actorId: $actorId}) RETURN a",
-                            org.neo4j.driver.v1.Values.parameters("actorId", actorId));
+                    // Commit the query for persistence
+                    tx.success();
 
-                    if (!actorResult.hasNext()) {
-                        // If the actor does not exist, respond with 400 (Bad Request)
-                        statusCode = 400;
-                    } else {
-                        // Added relationship creation between actor and award
-                        tx.run("MATCH (a:Actor {actorId: $actorId}), (w:Award {awardId: $awardId}) " +
-                                        "MERGE (a)-[:HAS_AWARD]->(w)",
-                                org.neo4j.driver.v1.Values.parameters("actorId", actorId, "awardId", awardId));
-
-                        // Commit the query for persistence
-                        tx.success();
-
-                        System.out.println("Award added: " + awardName + " to actor: " + actorId);
-                        statusCode = 200;
-                    }
-                } else {
-                    // the award ID already exists
-                    statusCode = 400;
+                    System.out.println("Award added: " + awardName);
+                    statusCode = 200;
                 }
             } catch (Exception e) {
                 System.out.println("Exception: " + e);
