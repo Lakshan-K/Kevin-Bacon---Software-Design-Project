@@ -47,25 +47,25 @@ public class GetAward implements HttpHandler {
         // Parse the request body string into a JSON object
         JSONObject deserialized = new JSONObject(body);
 
-        // Variables to hold the HTTP status code and the awardId from the request
+        // Variables to hold the HTTP status code and the awardName from the request
         int statusCode = 0;
-        String awardId = "";
+        String awardName = "";
 
-        // Check if the awardId is present in the request body. If not, set status code to 400 (Bad Request)
-        if (deserialized.has("awardId")) {
-            awardId = deserialized.getString("awardId");
+        // Check if the awardName is present in the request body. If not, set status code to 400 (Bad Request)
+        if (deserialized.has("name")) {
+            awardName = deserialized.getString("name");
         } else {
-            statusCode = 400;  // Bad request because awardId is missing
+            statusCode = 400;  // Bad request because awardName is missing
         }
 
         // If no issues with the request, proceed to query the database
         if (statusCode == 0) {
             // Begin a transaction to query the Neo4j database
             try (Transaction tx = Utils.driver.session().beginTransaction()) {
-                // Query to find the award by awardId and return its name and the list of actors who won it
-                StatementResult result = tx.run("MATCH (a:Actor)-[:HAS_AWARD]->(aw:Award {awardId: $awardId}) " +
-                                "RETURN aw.name AS awardName, aw.awardId AS awardId, collect({name: a.name, actorId: a.actorId}) AS actors",
-                        org.neo4j.driver.v1.Values.parameters("awardId", awardId));
+                // Query to find the award by awardName and return its name and the list of actors who won it
+                StatementResult result = tx.run("MATCH (a:Actor)-[:HAS_AWARD]->(aw:Award {name: $awardName}) " +
+                                "RETURN aw.name AS awardName, collect({name: a.name, actorId: a.actorId}) AS actors",
+                        org.neo4j.driver.v1.Values.parameters("awardName", awardName));
 
                 System.out.println("Query executed. Checking result...");
 
@@ -74,7 +74,6 @@ public class GetAward implements HttpHandler {
                     System.out.println("Result hasNext: true");
                     Record record = result.next();
                     // Retrieve the award's details from the query result
-                    String name = record.get("awardName").asString();
                     JSONArray actorsArray = new JSONArray();
                     for (Object actorObj : record.get("actors").asList()) {
                         Map<String, Object> actorMap = (Map<String, Object>) actorObj;
@@ -86,8 +85,7 @@ public class GetAward implements HttpHandler {
 
                     // Prepare the JSON response with the award details
                     JSONObject response = new JSONObject();
-                    response.put("awardId", awardId);
-                    response.put("awardName", name);
+                    response.put("awardName", awardName);
                     response.put("actors", actorsArray);
 
                     // Send the response with status 200 (OK)
@@ -116,4 +114,3 @@ public class GetAward implements HttpHandler {
         }
     }
 }
-
