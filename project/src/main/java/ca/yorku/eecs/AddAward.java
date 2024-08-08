@@ -65,26 +65,29 @@ public class AddAward implements HttpHandler {
                     // Create the award if it does not exist
                     tx.run("CREATE (w:Award {name: $awardName, awardId: $awardId})",
                             org.neo4j.driver.v1.Values.parameters("awardName", awardName, "awardId", awardId));
-                }
 
-                // Ensure the actor exists
-                StatementResult actorResult = tx.run("MATCH (a:Actor {actorId: $actorId}) RETURN a",
-                        org.neo4j.driver.v1.Values.parameters("actorId", actorId));
+                    // Ensure the actor exists
+                    StatementResult actorResult = tx.run("MATCH (a:Actor {actorId: $actorId}) RETURN a",
+                            org.neo4j.driver.v1.Values.parameters("actorId", actorId));
 
-                if (!actorResult.hasNext()) {
-                    // If the actor does not exist, respond with 400 (Bad Request)
-                    statusCode = 400;
+                    if (!actorResult.hasNext()) {
+                        // If the actor does not exist, respond with 400 (Bad Request)
+                        statusCode = 400;
+                    } else {
+                        // Added relationship creation between actor and award
+                        tx.run("MATCH (a:Actor {actorId: $actorId}), (w:Award {awardId: $awardId}) " +
+                                        "MERGE (a)-[:HAS_AWARD]->(w)",
+                                org.neo4j.driver.v1.Values.parameters("actorId", actorId, "awardId", awardId));
+
+                        // Commit the query for persistence
+                        tx.success();
+
+                        System.out.println("Award added: " + awardName + " to actor: " + actorId);
+                        statusCode = 200;
+                    }
                 } else {
-                    // Added relationship creation between actor and award
-                    tx.run("MATCH (a:Actor {actorId: $actorId}), (w:Award {awardId: $awardId}) " +
-                                    "MERGE (a)-[:HAS_AWARD]->(w)",
-                            org.neo4j.driver.v1.Values.parameters("actorId", actorId, "awardId", awardId));
-
-                    // Commit the query for persistence
-                    tx.success();
-
-                    System.out.println("Award added: " + awardName + " to actor: " + actorId);
-                    statusCode = 200;
+                    // the award ID already exists
+                    statusCode = 400;
                 }
             } catch (Exception e) {
                 System.out.println("Exception: " + e);
