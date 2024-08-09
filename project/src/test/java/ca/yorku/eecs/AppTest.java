@@ -469,22 +469,6 @@ public class AppTest
      */
     public void testAddAwardFail() {
         try {
-            // Step 1: First, add the award to ensure it exists
-            String initialJsonString = "{\"name\":\"Oscars\",\"awardId\":\"ad0000001\",\"actorId\":\"nm1001213\"}";
-            URL addUrl = new URL("http://localhost:8080/api/v1/addAward");
-            HttpURLConnection addConnection = (HttpURLConnection) addUrl.openConnection();
-            addConnection.setRequestMethod("PUT");
-            addConnection.setRequestProperty("Content-Type", "application/json; utf-8");
-            addConnection.setDoOutput(true);
-            try (OutputStream os = addConnection.getOutputStream()) {
-                byte[] input = initialJsonString.getBytes("UTF-8");
-                os.write(input, 0, input.length);
-            }
-            int addResponseCode = addConnection.getResponseCode();
-            assertEquals(200, addResponseCode);
-            addConnection.disconnect();
-
-            // Step 2: Attempt to add the same award again, which should fail with 400
             String duplicateJsonString = "{\"name\":\"Oscars\",\"awardId\":\"ad0000001\",\"actorId\":\"nm1001213\"}";
             URL duplicateUrl = new URL("http://localhost:8080/api/v1/addAward");
             HttpURLConnection duplicateConnection = (HttpURLConnection) duplicateUrl.openConnection();
@@ -505,7 +489,9 @@ public class AppTest
         }
     }
 
-    // test case for GET Award Pass
+    /**
+     * Test GET Award Pass
+     */
     public void testGetAwardPass(){
         try {
             String jsonString = "{\"name\":\"Oscars\"}";
@@ -541,6 +527,35 @@ public class AppTest
             connection.disconnect();
         } catch (Exception e) {
            System.out.println(e);
+            fail("Exception occurred: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Test GET Award Fail
+     */
+    public void testGetAwardFail(){
+        try {
+            String jsonString = "{\"name\":\"Best Director\"}";
+
+            // Encode JSON string for URL
+            String encodedJson = URLEncoder.encode(jsonString, "UTF-8");
+
+            // Create URL object
+            URL getURL = new URL("http://localhost:8080/api/v1/getAward?jsonString=" + encodedJson);
+
+            // Open connection
+            HttpURLConnection connection = (HttpURLConnection) getURL.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/json; utf-8");
+
+            // Get response code
+            int responseCode = connection.getResponseCode();
+            assertEquals(404, responseCode);
+
+            connection.disconnect();
+        } catch (Exception e) {
+            System.out.println(e);
             fail("Exception occurred: " + e.getMessage());
         }
     }
@@ -602,9 +617,6 @@ public class AppTest
             fail("Exception occurred: " + e.getMessage());
         }
     }
-
-
-
 
     /**
      * Test case for GET Get Actor Fail
