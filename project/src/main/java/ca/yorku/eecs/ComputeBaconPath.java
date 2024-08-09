@@ -11,7 +11,6 @@ import org.neo4j.driver.v1.Transaction;
 
 import java.io.IOException;
 import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class ComputeBaconPath implements HttpHandler {
@@ -46,7 +45,7 @@ public class ComputeBaconPath implements HttpHandler {
         // check if the request body is empty
         if(body.isEmpty()) {
             String uri = r.getRequestURI().toString().split("\\?jsonString=")[1];
-            body = URLDecoder.decode(uri, StandardCharsets.UTF_8);
+            body = URLDecoder.decode(uri, "UTF-8");
             System.out.println("Request URI: " + body);
         }
 

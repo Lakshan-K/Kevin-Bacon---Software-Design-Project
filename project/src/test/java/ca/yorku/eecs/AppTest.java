@@ -10,7 +10,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Unit test for simple App.
@@ -54,7 +53,7 @@ public class AppTest
 
             // Write the JSON payload to the request body
             try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonString.getBytes(StandardCharsets.UTF_8);
+                byte[] input = jsonString.getBytes("UTF-8");
                 os.write(input, 0, input.length);
             }
 
@@ -87,7 +86,7 @@ public class AppTest
 
             // Write the JSON payload to the request body
             try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonString.getBytes(StandardCharsets.UTF_8);
+                byte[] input = jsonString.getBytes("UTF-8");
                 os.write(input, 0, input.length);
             }
 
@@ -120,7 +119,7 @@ public class AppTest
 
             // Write the JSON payload to the request body
             try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonString.getBytes(StandardCharsets.UTF_8);
+                byte[] input = jsonString.getBytes("UTF-8");
                 os.write(input, 0, input.length);
             }
 
@@ -153,7 +152,7 @@ public class AppTest
 
             // Write the JSON payload to the request body
             try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonString.getBytes(StandardCharsets.UTF_8);
+                byte[] input = jsonString.getBytes("UTF-8");
                 os.write(input, 0, input.length);
             }
 
@@ -186,7 +185,7 @@ public class AppTest
 
             // Write the JSON payload to the request body
             try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonString.getBytes(StandardCharsets.UTF_8);
+                byte[] input = jsonString.getBytes("UTF-8");
                 os.write(input, 0, input.length);
             }
 
@@ -219,7 +218,7 @@ public class AppTest
 
             // Write the JSON payload to the request body
             try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonString.getBytes(StandardCharsets.UTF_8);
+                byte[] input = jsonString.getBytes("UTF-8");
                 os.write(input, 0, input.length);
             }
 
@@ -252,7 +251,7 @@ public class AppTest
 
             // Write the JSON payload to the request body
             try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonString.getBytes(StandardCharsets.UTF_8);
+                byte[] input = jsonString.getBytes("UTF-8");
                 os.write(input, 0, input.length);
             }
 
@@ -285,7 +284,7 @@ public class AppTest
 
             // Write the JSON payload to the request body
             try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonString.getBytes(StandardCharsets.UTF_8);
+                byte[] input = jsonString.getBytes("UTF-8");
                 os.write(input, 0, input.length);
             }
 
@@ -318,7 +317,7 @@ public class AppTest
 
             // Write the JSON payload to the request body
             try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonString.getBytes(StandardCharsets.UTF_8);
+                byte[] input = jsonString.getBytes("UTF-8");
                 os.write(input, 0, input.length);
             }
 
@@ -351,7 +350,7 @@ public class AppTest
 
             // Write the JSON payload to the request body
             try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonString.getBytes(StandardCharsets.UTF_8);
+                byte[] input = jsonString.getBytes("UTF-8");
                 os.write(input, 0, input.length);
             }
 
@@ -384,7 +383,7 @@ public class AppTest
 
             // Write the JSON payload to the request body
             try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonString.getBytes(StandardCharsets.UTF_8);
+                byte[] input = jsonString.getBytes("UTF-8");
                 os.write(input, 0, input.length);
             }
 
@@ -417,7 +416,7 @@ public class AppTest
 
             // Write the JSON payload to the request body
             try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonString.getBytes(StandardCharsets.UTF_8);
+                byte[] input = jsonString.getBytes("UTF-8");
                 os.write(input, 0, input.length);
             }
 
@@ -450,7 +449,7 @@ public class AppTest
 
             // Write the JSON payload to the request body
             try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonString.getBytes(StandardCharsets.UTF_8);
+                byte[] input = jsonString.getBytes("UTF-8");
                 os.write(input, 0, input.length);
             }
 
@@ -483,7 +482,7 @@ public class AppTest
 
             // Write the JSON payload to the request body
             try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonString.getBytes(StandardCharsets.UTF_8);
+                byte[] input = jsonString.getBytes("UTF-8");
                 os.write(input, 0, input.length);
             }
 
@@ -504,7 +503,7 @@ public class AppTest
             String jsonString = "{\"name\":\"Oscars\"}";
 
             // Encode JSON string for URL
-            String encodedJson = URLEncoder.encode(jsonString, StandardCharsets.UTF_8);
+            String encodedJson = URLEncoder.encode(jsonString, "UTF-8");
 
             // Create URL object
             URL getURL = new URL("http://localhost:8080/api/v1/getAward?jsonString=" + encodedJson);
