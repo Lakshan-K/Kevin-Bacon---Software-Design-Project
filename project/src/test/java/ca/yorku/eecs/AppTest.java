@@ -728,4 +728,251 @@ public class AppTest
             fail("Exception occurred: " + e.getMessage());
         }
     }
+
+    /**
+     * VARUN MALHOTRA
+     * Test case for GET Director Pass
+     */
+    public void testGetDirectorPass() {
+        try {
+            String jsonString = "{\"name\":\"Peter Berg\",\"directorId\":\"nm1000701\"}";
+
+            // Create URL object
+            URL getURL = new URL("http://localhost:8080/api/v1/addDirector");
+
+            // Open connection
+            HttpURLConnection connection = (HttpURLConnection) getURL.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/json; utf-8");
+            connection.setDoOutput(true);
+
+            // Write the JSON payload to the request body
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = jsonString.getBytes("UTF-8");
+                os.write(input, 0, input.length);
+            }
+
+            // Get response code
+            int responseCode = connection.getResponseCode();
+            assertEquals(200, responseCode);
+
+            // Read response
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String inputLine;
+            StringBuilder response = new StringBuilder();
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+
+            // Assert response content
+            String responseBody = response.toString();
+            assertNotNull(responseBody);
+
+            connection.disconnect();
+        } catch (Exception e) {
+            System.out.println(e);
+            fail("Exception occurred: " + e.getMessage());
+        }
+    }
+
+    /**
+     * VARUN MALHOTRA
+     * Test case for Get Director Fail
+     */
+    public void testGetDirectorFail() {
+        try {
+            String jsonString = "{\"name\":\"Ice Berg\",\"directorId\":\"nm1000701\"}";
+
+            // Create URL object
+            URL getURL = new URL("http://localhost:8080/api/v1/addDirector");
+
+            // Open connection
+            HttpURLConnection connection = (HttpURLConnection) getURL.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/json; utf-8");
+            connection.setDoOutput(true);
+
+            // Write the JSON payload to the request body
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = jsonString.getBytes("UTF-8");
+                os.write(input, 0, input.length);
+            }
+
+            // Get response code
+            int responseCode = connection.getResponseCode();
+            assertEquals(400, responseCode);
+
+            connection.disconnect();
+        } catch (Exception e) {
+            System.out.println(e);
+            fail("Exception occurred: " + e.getMessage());
+        }
+    }
+
+    /**
+     * VARUN MALHOTRA
+     * Test case for GET CoActor Pass
+     */
+    public void testGetCoActorPass() {
+        try {
+            String jsonString = "{\"name\":\"Mark Wahlberg\",\"coActorId\":\"nm1000800\"}";
+
+            // Create URL object
+            URL getURL = new URL("http://localhost:8080/api/v1/addDirector");
+
+            // Open connection
+            HttpURLConnection connection = (HttpURLConnection) getURL.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/json; utf-8");
+            connection.setDoOutput(true);
+
+            // Write the JSON payload to the request body
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = jsonString.getBytes("UTF-8");
+                os.write(input, 0, input.length);
+            }
+
+            // Get response code
+            int responseCode = connection.getResponseCode();
+            assertEquals(200, responseCode);
+
+            // Read response
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String inputLine;
+            StringBuilder response = new StringBuilder();
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+
+            // Assert response content
+            String responseBody = response.toString();
+            assertNotNull(responseBody);
+
+            connection.disconnect();
+        } catch (Exception e) {
+            System.out.println(e);
+            fail("Exception occurred: " + e.getMessage());
+        }
+    }
+
+    /**
+     * VARUN MALHOTRA
+     * Test case for Get CoActor Fail
+     */
+    public void testGetCoActorFail() {
+        try {
+            String jsonString = "{\"name\":\"Vin Diesel\",\"coActorId\":\"nm1000800\"}";
+
+            // Create URL object
+            URL getURL = new URL("http://localhost:8080/api/v1/addDirector");
+
+            // Open connection
+            HttpURLConnection connection = (HttpURLConnection) getURL.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/json; utf-8");
+            connection.setDoOutput(true);
+
+            // Write the JSON payload to the request body
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = jsonString.getBytes("UTF-8");
+                os.write(input, 0, input.length);
+            }
+
+            // Get response code
+            int responseCode = connection.getResponseCode();
+            assertEquals(400, responseCode);
+
+            connection.disconnect();
+        } catch (Exception e) {
+            System.out.println(e);
+            fail("Exception occurred: " + e.getMessage());
+        }
+    }
+
+//    /**
+//     * VARUN MALHOTRA
+//     * Test case for Has Relationship Pass
+//     */
+//    public void testHasRelationshipPass() {
+//        try {
+//            String jsonString = "{\"name\":\"Mark Wahlberg\",\"actorId\":\"nm1000800\"}";
+//
+//            // Create URL object
+//            URL getURL = new URL("http://localhost:8080/api/v1/addDirector");
+//
+//            // Open connection
+//            HttpURLConnection connection = (HttpURLConnection) getURL.openConnection();
+//            connection.setRequestMethod("GET");
+//            connection.setRequestProperty("Content-Type", "application/json; utf-8");
+//            connection.setDoOutput(true);
+//
+//            // Write the JSON payload to the request body
+//            try (OutputStream os = connection.getOutputStream()) {
+//                byte[] input = jsonString.getBytes("UTF-8");
+//                os.write(input, 0, input.length);
+//            }
+//
+//            // Get response code
+//            int responseCode = connection.getResponseCode();
+//            assertEquals(200, responseCode);
+//
+//            // Read response
+//            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+//            String inputLine;
+//            StringBuilder response = new StringBuilder();
+//            while ((inputLine = in.readLine()) != null) {
+//                response.append(inputLine);
+//            }
+//            in.close();
+//
+//            // Assert response content
+//            String responseBody = response.toString();
+//            assertNotNull(responseBody);
+//
+//            connection.disconnect();
+//        } catch (Exception e) {
+//            System.out.println(e);
+//            fail("Exception occurred: " + e.getMessage());
+//        }
+//    }
+//
+//    /**
+//     * VARUN MALHOTRA
+//     * Test case for Has Relationship Fail
+//     */
+//    public void testHasRelationshipFail() {
+//        try {
+//            String jsonString = "{\"name\":\"Vin Diesel\",\"coActorId\":\"nm1000800\"}";
+//
+//            // Create URL object
+//            URL getURL = new URL("http://localhost:8080/api/v1/addDirector");
+//
+//            // Open connection
+//            HttpURLConnection connection = (HttpURLConnection) getURL.openConnection();
+//            connection.setRequestMethod("GET");
+//            connection.setRequestProperty("Content-Type", "application/json; utf-8");
+//            connection.setDoOutput(true);
+//
+//            // Write the JSON payload to the request body
+//            try (OutputStream os = connection.getOutputStream()) {
+//                byte[] input = jsonString.getBytes("UTF-8");
+//                os.write(input, 0, input.length);
+//            }
+//
+//            // Get response code
+//            int responseCode = connection.getResponseCode();
+//            assertEquals(400, responseCode);
+//
+//            connection.disconnect();
+//        } catch (Exception e) {
+//            System.out.println(e);
+//            fail("Exception occurred: " + e.getMessage());
+//        }
+//    }
+
+
+
+
 }
