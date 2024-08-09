@@ -82,12 +82,4 @@ public class AppTest
             fail("Exception occurred: " + e.getMessage());
         }
     }
-
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        testGetAwardPass();
-    }
 }
