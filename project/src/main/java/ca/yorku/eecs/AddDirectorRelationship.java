@@ -37,39 +37,63 @@ public class AddDirectorRelationship implements HttpHandler {
         String movieId = "";
 
         // check if the required information is present in the body. If not, raise error 400
-        if (deserialized.has("directorId"))
+        if (deserialized.has("directorId")){
             directorId = deserialized.getString("directorId");
-        else
-            statusCode = 400;
 
-        if (deserialized.has("movieId"))
-            movieId = deserialized.getString("movieId");
-        else
-            statusCode = 400;
-
-        try (Transaction tx = Utils.driver.session().beginTransaction()) {
-            // check if there is any existing relationship between directorId and movieId
-            StatementResult result = tx.run("MATCH (d:Director {directorId: $directorId})-[r:DIRECTED]->(m:Movie {movieId: $movieId}) " +
-                    "RETURN r", org.neo4j.driver.v1.Values.parameters("directorId", directorId, "movieId", movieId));
-
-            // check for duplicate entries
-            if (result.hasNext()) {
+            // if movieId is empty, raise an error
+            if (directorId.isEmpty()) {
                 statusCode = 400;
-            } else {
-                // make the query
-                tx.run("MATCH (d:Director {directorId: $directorId}), (m:Movie {movieId: $movieId}) " +
-                                "CREATE (d)-[r:DIRECTED]->(m)",
-                        org.neo4j.driver.v1.Values.parameters("directorId", directorId, "movieId", movieId));
-
-                // commit the query for persistence
-                tx.success();
-
-                System.out.println("Director Relation added");
-                statusCode = 200;
             }
-        } catch (Exception e) {
-            System.out.println("Exception: " + e);
-            statusCode = 500;
+        } else
+            statusCode = 400;
+
+        if (deserialized.has("movieId")){
+            movieId = deserialized.getString("movieId");
+
+            // if movieId is empty, raise an error
+            if (movieId.isEmpty()) {
+                statusCode = 400;
+            }
+        } else
+            statusCode = 400;
+
+        if(statusCode == 0) {
+
+            try (Transaction tx = Utils.driver.session().beginTransaction()) {
+
+                StatementResult result = tx.run("MATCH (d:Director {directorId: $directorId})\n" +
+                        "MATCH (m:Movie {movieId: $movieId})\n" +
+                        "RETURN d, m", org.neo4j.driver.v1.Values.parameters("directorId", directorId, "movieId", movieId));
+
+                // check if the result has value which indicates that the actorID and movieID exists.
+                // if empty, then either of them or both do no exist
+                if (!result.hasNext()) {
+                    statusCode = 404;
+                } else {
+                    // check if there is any existing relationship between directorId and movieId
+                    result = tx.run("MATCH (d:Director {directorId: $directorId})-[r:DIRECTED]->(m:Movie {movieId: $movieId}) " +
+                            "RETURN r", org.neo4j.driver.v1.Values.parameters("directorId", directorId, "movieId", movieId));
+
+                    // check for duplicate entries
+                    if (result.hasNext()) {
+                        statusCode = 400;
+                    } else {
+                        // make the query
+                        tx.run("MATCH (d:Director {directorId: $directorId}), (m:Movie {movieId: $movieId}) " +
+                                        "CREATE (d)-[r:DIRECTED]->(m)",
+                                org.neo4j.driver.v1.Values.parameters("directorId", directorId, "movieId", movieId));
+
+                        // commit the query for persistence
+                        tx.success();
+
+                        System.out.println("Director Relation added");
+                        statusCode = 200;
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("Exception: " + e);
+                statusCode = 500;
+            }
         }
 
         r.sendResponseHeaders(statusCode, -1);
