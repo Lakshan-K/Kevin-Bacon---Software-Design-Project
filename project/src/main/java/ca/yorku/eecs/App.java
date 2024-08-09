@@ -31,9 +31,6 @@ public class App {
         // Registering the context for AddDirectorRelationship handler
         server.createContext("/api/v1/addDirectorRelationship", new AddDirectorRelationship());
 
-        // Registering the context for AddAwardRelationship handler
-        server.createContext("/api/v1/addAwardRelationship", new AddAwardRelationship());
-
         // Registering the context for GetActor handler
         server.createContext("/api/v1/getActor", new GetActor());
 
