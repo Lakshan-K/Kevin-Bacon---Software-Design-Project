@@ -71,8 +71,8 @@ public class GetCoActor implements HttpHandler {
             // Start a transaction to query the database
             try (Transaction tx = Utils.driver.session().beginTransaction()) {
                 // Query to find the actor by coActorId and get their details
-                StatementResult result = tx.run("MATCH (a:CoActor {coActorId: $coActorId}) RETURN a.name AS name, " +
-                                "[ (a)-[:ACTED_IN]->(m:Movie) | m.movieId ] AS movies",
+                StatementResult result = tx.run("MATCH (a:actor {id: $coActorId}) RETURN a.Name AS name, " +
+                                "[ (a)-[:ACTED_WITH]->(b:actor) | b.id ] AS coActors",
                         org.neo4j.driver.v1.Values.parameters("coActorId", coActorId));
 
                 System.out.println("Query executed. Checking result...");
@@ -83,13 +83,13 @@ public class GetCoActor implements HttpHandler {
                     Record record = result.next();
                     // Get the coActor's details
                     String name = record.get("name").asString();
-                    JSONArray movies = new JSONArray(record.get("movies").asList());
+                    JSONArray coActors = new JSONArray(record.get("coActors").asList());
 
                     // Prepare the response JSON
                     JSONObject response = new JSONObject();
                     response.put("coActorId", coActorId);
                     response.put("name", name);
-                    response.put("movies", movies);
+                    response.put("coActors", coActors);
 
                     // Send the response with a 200 status code
                     r.getResponseHeaders().add("Content-Type", "application/json");

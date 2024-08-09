@@ -2,19 +2,17 @@ package ca.yorku.eecs;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.neo4j.driver.v1.Record;
 import org.neo4j.driver.v1.StatementResult;
 import org.neo4j.driver.v1.Transaction;
 
 import java.io.IOException;
 import java.net.URLDecoder;
 
-public class hasRelationship implements HttpHandler {
+public class HasRelationship implements HttpHandler {
 
-    public hasRelationship() {
+    public HasRelationship() {
         System.out.println("GetMovie handler initialized");
     }
 
@@ -55,13 +53,22 @@ public class hasRelationship implements HttpHandler {
 
         // Variables to hold the HTTP status code and actorID
         int statusCode = 0;
-        String coActorId = "";
+        String actorId = "";
+        String movieId = "";
 
-        // Check if the coActorId is present in the request body
-        if (deserialized.has("coActorId")) {
-            coActorId = deserialized.getString("coActorId");
+        // Check if the actorId is present in the request body
+        if (deserialized.has("actorId")) {
+            actorId = deserialized.getString("actorId");
         } else {
-            // If coActorId is missing, set status code to 400 (Bad Request)
+            // If actorId is missing, set status code to 400 (Bad Request)
+            statusCode = 400;
+        }
+
+        // Check if the movieId is present in the request body
+        if (deserialized.has("movieId")) {
+            movieId = deserialized.getString("movieId");
+        } else {
+            // If actorId is missing, set status code to 400 (Bad Request)
             statusCode = 400;
         }
 
@@ -69,26 +76,21 @@ public class hasRelationship implements HttpHandler {
         if (statusCode == 0) {
             // Start a transaction to query the database
             try (Transaction tx = Utils.driver.session().beginTransaction()) {
-                // Query to find the actor by coActorId and get their details
-                StatementResult result = tx.run("MATCH (a:CoActor {coActorId: $coActorId}) RETURN a.name AS name, " +
-                                "[ (a)-[:ACTED_IN]->(m:Movie) | m.movieId ] AS movies",
-                        org.neo4j.driver.v1.Values.parameters("coActorId", coActorId));
+                // Query to find the actor by actorId and get their details
+                StatementResult result = tx.run("MATCH (a:actor {id: $actorId})-[r:ACTED_IN]->(m:movie {id: $movieId}) " +
+                        "RETURN r", org.neo4j.driver.v1.Values.parameters("actorId", actorId, "movieId", movieId));
 
                 System.out.println("Query executed. Checking result...");
 
                 // Check if the coActor exists
                 if (result.hasNext()) {
                     System.out.println("Result hasNext: true");
-                    Record record = result.next();
-                    // Get the coActor's details
-                    String name = record.get("name").asString();
-                    JSONArray movies = new JSONArray(record.get("movies").asList());
 
                     // Prepare the response JSON
                     JSONObject response = new JSONObject();
-                    response.put("coActorId", coActorId);
-                    response.put("name", name);
-                    response.put("movies", movies);
+                    response.put("actorId", actorId);
+                    response.put("movieId", movieId);
+                    response.put("HasRelationship", true);
 
                     // Send the response with a 200 status code
                     r.getResponseHeaders().add("Content-Type", "application/json");
@@ -98,7 +100,7 @@ public class hasRelationship implements HttpHandler {
                     return;
                 } else {
                     System.out.println("Result hasNext: false");
-                    // If the coActor isn't found, set status code to 404 (Not Found)
+                    // If the relationship isn't found, set status code to 404 (Not Found)
                     statusCode = 404;
                 }
 

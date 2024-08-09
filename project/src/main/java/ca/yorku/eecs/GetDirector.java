@@ -69,8 +69,8 @@ public class GetDirector implements HttpHandler {
             // Start a transaction to query the database
             try (Transaction tx = Utils.driver.session().beginTransaction()) {
                 // Query to find the director by directorId and get their details
-                StatementResult result = tx.run("MATCH (a:Director {directorId: $directorId}) RETURN a.name AS name, " +
-                                "[ (a)-[:Directed]->(m:Movie) | m.movieId ] AS movies",
+                StatementResult result = tx.run("MATCH (a:director {id: $directorId}) RETURN a.Name AS name, " +
+                                "[ (a)-[:DIRECTED]->(m:movie) | m.id ] AS movies",
                         org.neo4j.driver.v1.Values.parameters("directorId", directorId));
 
                 System.out.println("Query executed. Checking result...");

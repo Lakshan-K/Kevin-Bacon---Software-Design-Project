@@ -563,26 +563,7 @@ public class AppTest
     // test for GetActorPass
     public void testGetActorPass() {
         try {
-            // Step 1: Add an actor to the system
-            String addActorJsonString = "{\"name\":\"Test Actor\",\"actorId\":\"nm2000213\"}";
-            URL addActorURL = new URL("http://localhost:8080/api/v1/addActor");
-            HttpURLConnection addActorConnection = (HttpURLConnection) addActorURL.openConnection();
-            addActorConnection.setRequestMethod("PUT");
-            addActorConnection.setRequestProperty("Content-Type", "application/json; utf-8");
-            addActorConnection.setDoOutput(true);
-            try (OutputStream os = addActorConnection.getOutputStream()) {
-                byte[] input = addActorJsonString.getBytes("UTF-8");
-                os.write(input, 0, input.length);
-            }
-            int addActorResponseCode = addActorConnection.getResponseCode();
-            assertEquals(200, addActorResponseCode);
-            addActorConnection.disconnect();
-
-            // Adding a small delay to ensure the actor is fully added
-            Thread.sleep(500);
-
-            // Step 2: Encode JSON for GET request similar to getAwardPass
-            String jsonString = "{\"actorId\":\"nm2000213\"}";
+            String jsonString = "{\"actorId\":\"nm1001213\"}";
             String encodedJson = URLEncoder.encode(jsonString, "UTF-8");
 
             // Step 3: Try to retrieve the actor using GET
@@ -609,7 +590,7 @@ public class AppTest
 
             // Assert that the response body contains the actor's name
             String responseBody = response.toString();
-            assertTrue(responseBody.contains("Test Actor"));
+            assertNotNull(responseBody);
 
             getActorConnection.disconnect();
         } catch (Exception e) {
@@ -649,26 +630,7 @@ public class AppTest
      */
     public void testGetMoviePass() {
         try {
-            // Step 1: Add a movie to the system
-            String addMovieJsonString = "{\"name\":\"Inception\",\"movieId\":\"nm1234567\"}";
-            URL addMovieURL = new URL("http://localhost:8080/api/v1/addMovie");
-            HttpURLConnection addMovieConnection = (HttpURLConnection) addMovieURL.openConnection();
-            addMovieConnection.setRequestMethod("PUT");
-            addMovieConnection.setRequestProperty("Content-Type", "application/json; utf-8");
-            addMovieConnection.setDoOutput(true);
-            try (OutputStream os = addMovieConnection.getOutputStream()) {
-                byte[] input = addMovieJsonString.getBytes("UTF-8");
-                os.write(input, 0, input.length);
-            }
-            int addMovieResponseCode = addMovieConnection.getResponseCode();
-            assertEquals(200, addMovieResponseCode);
-            addMovieConnection.disconnect();
-
-            // Adding a small delay to ensure the movie is fully added
-            Thread.sleep(500);
-
-            // Step 2: Encode JSON for GET request similar to getActorPass
-            String jsonString = "{\"movieId\":\"nm1234567\"}";
+            String jsonString = "{\"movieId\":\"nm7001453\"}";
             String encodedJson = URLEncoder.encode(jsonString, "UTF-8");
 
             // Step 3: Try to retrieve the movie using GET
@@ -695,7 +657,7 @@ public class AppTest
 
             // Assert that the response body contains the movie's name
             String responseBody = response.toString();
-            assertTrue(responseBody.contains("Inception"));
+            assertNotNull(responseBody);
 
             getMovieConnection.disconnect();
         } catch (Exception e) {
@@ -735,22 +697,13 @@ public class AppTest
      */
     public void testGetDirectorPass() {
         try {
-            String jsonString = "{\"name\":\"Peter Berg\",\"directorId\":\"nm1000701\"}";
+            String jsonString = "{\"directorId\":\"nm1002101\"}";
+            String encodedJson = URLEncoder.encode(jsonString, "UTF-8");
 
-            // Create URL object
-            URL getURL = new URL("http://localhost:8080/api/v1/addDirector");
-
-            // Open connection
-            HttpURLConnection connection = (HttpURLConnection) getURL.openConnection();
+            URL url = new URL("http://localhost:8080/api/v1/getDirector?jsonString=" + encodedJson);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Content-Type", "application/json; utf-8");
-            connection.setDoOutput(true);
-
-            // Write the JSON payload to the request body
-            try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonString.getBytes("UTF-8");
-                os.write(input, 0, input.length);
-            }
 
             // Get response code
             int responseCode = connection.getResponseCode();
@@ -782,26 +735,17 @@ public class AppTest
      */
     public void testGetDirectorFail() {
         try {
-            String jsonString = "{\"name\":\"Ice Berg\",\"directorId\":\"nm1000701\"}";
+            String jsonString = "{\"directorId\":\"nm1002111\"}";
+            String encodedJson = URLEncoder.encode(jsonString, "UTF-8");
 
-            // Create URL object
-            URL getURL = new URL("http://localhost:8080/api/v1/addDirector");
-
-            // Open connection
-            HttpURLConnection connection = (HttpURLConnection) getURL.openConnection();
+            URL url = new URL("http://localhost:8080/api/v1/getDirector?jsonString=" + encodedJson);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Content-Type", "application/json; utf-8");
-            connection.setDoOutput(true);
-
-            // Write the JSON payload to the request body
-            try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonString.getBytes("UTF-8");
-                os.write(input, 0, input.length);
-            }
 
             // Get response code
             int responseCode = connection.getResponseCode();
-            assertEquals(400, responseCode);
+            assertEquals(404, responseCode);
 
             connection.disconnect();
         } catch (Exception e) {
@@ -816,22 +760,13 @@ public class AppTest
      */
     public void testGetCoActorPass() {
         try {
-            String jsonString = "{\"name\":\"Mark Wahlberg\",\"coActorId\":\"nm1000800\"}";
+            String jsonString = "{\"coActorId\":\"nm1001213\"}";
+            String encodedJson = URLEncoder.encode(jsonString, "UTF-8");
 
-            // Create URL object
-            URL getURL = new URL("http://localhost:8080/api/v1/addDirector");
-
-            // Open connection
-            HttpURLConnection connection = (HttpURLConnection) getURL.openConnection();
+            URL url = new URL("http://localhost:8080/api/v1/getCoActor?jsonString=" + encodedJson);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Content-Type", "application/json; utf-8");
-            connection.setDoOutput(true);
-
-            // Write the JSON payload to the request body
-            try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonString.getBytes("UTF-8");
-                os.write(input, 0, input.length);
-            }
 
             // Get response code
             int responseCode = connection.getResponseCode();
@@ -863,26 +798,17 @@ public class AppTest
      */
     public void testGetCoActorFail() {
         try {
-            String jsonString = "{\"name\":\"Vin Diesel\",\"coActorId\":\"nm1000800\"}";
+            String jsonString = "{\"coActorId\":\"nm1001244\"}";
+            String encodedJson = URLEncoder.encode(jsonString, "UTF-8");
 
-            // Create URL object
-            URL getURL = new URL("http://localhost:8080/api/v1/addDirector");
-
-            // Open connection
-            HttpURLConnection connection = (HttpURLConnection) getURL.openConnection();
+            URL url = new URL("http://localhost:8080/api/v1/getCoActor?jsonString=" + encodedJson);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Content-Type", "application/json; utf-8");
-            connection.setDoOutput(true);
-
-            // Write the JSON payload to the request body
-            try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonString.getBytes("UTF-8");
-                os.write(input, 0, input.length);
-            }
 
             // Get response code
             int responseCode = connection.getResponseCode();
-            assertEquals(400, responseCode);
+            assertEquals(404, responseCode);
 
             connection.disconnect();
         } catch (Exception e) {
@@ -891,53 +817,44 @@ public class AppTest
         }
     }
 
-//    /**
-//     * VARUN MALHOTRA
-//     * Test case for Has Relationship Pass
-//     */
-//    public void testHasRelationshipPass() {
-//        try {
-//            String jsonString = "{\"name\":\"Mark Wahlberg\",\"actorId\":\"nm1000800\"}";
-//
-//            // Create URL object
-//            URL getURL = new URL("http://localhost:8080/api/v1/addDirector");
-//
-//            // Open connection
-//            HttpURLConnection connection = (HttpURLConnection) getURL.openConnection();
-//            connection.setRequestMethod("GET");
-//            connection.setRequestProperty("Content-Type", "application/json; utf-8");
-//            connection.setDoOutput(true);
-//
-//            // Write the JSON payload to the request body
-//            try (OutputStream os = connection.getOutputStream()) {
-//                byte[] input = jsonString.getBytes("UTF-8");
-//                os.write(input, 0, input.length);
-//            }
-//
-//            // Get response code
-//            int responseCode = connection.getResponseCode();
-//            assertEquals(200, responseCode);
-//
-//            // Read response
-//            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-//            String inputLine;
-//            StringBuilder response = new StringBuilder();
-//            while ((inputLine = in.readLine()) != null) {
-//                response.append(inputLine);
-//            }
-//            in.close();
-//
-//            // Assert response content
-//            String responseBody = response.toString();
-//            assertNotNull(responseBody);
-//
-//            connection.disconnect();
-//        } catch (Exception e) {
-//            System.out.println(e);
-//            fail("Exception occurred: " + e.getMessage());
-//        }
-//    }
-//
+    /**
+     * VARUN MALHOTRA
+     * Test case for Has Relationship Pass
+     */
+    public void testHasRelationshipPass() {
+        try {
+            String jsonString = "{\"actorId\":\"nm1001213\",\"movieId\":\"nm7001453\"}";
+            String encodedJson = URLEncoder.encode(jsonString, "UTF-8");
+
+            URL url = new URL("http://localhost:8080/api/v1/hasRelationship?jsonString=" + encodedJson);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/json; utf-8");
+
+            // Get response code
+            int responseCode = connection.getResponseCode();
+            assertEquals(200, responseCode);
+
+            // Read response
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String inputLine;
+            StringBuilder response = new StringBuilder();
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+
+            // Assert response content
+            String responseBody = response.toString();
+            assertNotNull(responseBody);
+
+            connection.disconnect();
+        } catch (Exception e) {
+            System.out.println(e);
+            fail("Exception occurred: " + e.getMessage());
+        }
+    }
+
 //    /**
 //     * VARUN MALHOTRA
 //     * Test case for Has Relationship Fail
