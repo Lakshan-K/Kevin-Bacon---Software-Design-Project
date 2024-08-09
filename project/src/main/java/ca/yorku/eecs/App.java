@@ -37,6 +37,12 @@ public class App {
         // Registering the context for GetMovie handler
         server.createContext("/api/v1/getMovie", new GetMovie());
 
+        // Registering the context for GetCoActor handler
+        server.createContext("/api/v1/getCoActor", new GetCoActor());
+
+        // Registering the context for GetDirector handler
+        server.createContext("/api/v1/getDirector", new GetDirector());
+
         // Registering the context for GetAward handler
         server.createContext("/api/v1/getAward", new GetAward());
 
