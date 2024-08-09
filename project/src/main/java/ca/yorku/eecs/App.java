@@ -43,6 +43,12 @@ public class App {
         // Registering the context for GetAward handler
         server.createContext("/api/v1/getAward", new GetAward());
 
+        // Registering the context for ComputeBaconNumber handler
+        server.createContext("/api/v1/computeBaconNumber", new ComputeBaconNumber());
+
+        // Registering the context for ComputeBaconPath handler
+        server.createContext("/api/v1/computeBaconPath", new ComputeBaconPath());
+
         // Starting the server
         server.start();
         System.out.printf("Server started on port %d...\n", PORT);
