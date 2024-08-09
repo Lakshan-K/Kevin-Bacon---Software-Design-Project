@@ -56,18 +56,18 @@ public class AddAward implements HttpHandler {
         if (statusCode == 0) {
             try (Transaction tx = Utils.driver.session().beginTransaction()) {
                 // Check if there is any data with the same awardId
-                StatementResult result = tx.run("MATCH (w:Award {awardId: $awardId}) RETURN w",
+                StatementResult result = tx.run("MATCH (w:award {awardId: $awardId}) RETURN w",
                         org.neo4j.driver.v1.Values.parameters("awardId", awardId));
 
                 // Check for duplicate entries
                 if(result.hasNext()) {
                     // Award already exists, so just create the relationship if it doesn't exist
-                    StatementResult relationshipResult = tx.run("MATCH (a:Actor {actorId: $actorId})-[:HAS_AWARD]->(w:Award {awardId: $awardId}) RETURN a",
+                    StatementResult relationshipResult = tx.run("MATCH (a:actor {actorId: $actorId})-[:HAS_AWARD]->(w:award {awardId: $awardId}) RETURN a",
                             org.neo4j.driver.v1.Values.parameters("actorId", actorId, "awardId", awardId));
 
                     if (!relationshipResult.hasNext()) {
                         // Create the relationship between the actor and the award
-                        tx.run("MATCH (a:Actor {actorId: $actorId}), (w:Award {awardId: $awardId}) " +
+                        tx.run("MATCH (a:actor {actorId: $actorId}), (w:award {awardId: $awardId}) " +
                                         "MERGE (a)-[:HAS_AWARD]->(w)",
                                 org.neo4j.driver.v1.Values.parameters("actorId", actorId, "awardId", awardId));
                     } else {
@@ -75,11 +75,11 @@ public class AddAward implements HttpHandler {
                     }
                 } else {
                     // Award doesn't exist, create it and then create the relationship
-                    tx.run("CREATE (w:Award {name: $awardName, awardId: $awardId})",
+                    tx.run("CREATE (w:award {name: $awardName, awardId: $awardId})",
                             org.neo4j.driver.v1.Values.parameters("awardName", awardName, "awardId", awardId));
 
                     // Create the relationship between the actor and the award
-                    tx.run("MATCH (a:Actor {actorId: $actorId}), (w:Award {awardId: $awardId}) " +
+                    tx.run("MATCH (a:actor {actorId: $actorId}), (w:Award {awardId: $awardId}) " +
                                     "MERGE (a)-[:HAS_AWARD]->(w)",
                             org.neo4j.driver.v1.Values.parameters("actorId", actorId, "awardId", awardId));
                 }

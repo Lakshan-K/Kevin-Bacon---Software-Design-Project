@@ -53,7 +53,7 @@ public class ComputeBaconPath implements HttpHandler {
 
         if (statusCode == 0) {
             try (Transaction tx = Utils.driver.session().beginTransaction()) {
-                String query = "MATCH (bacon:Actor {actorId: $baconId}), (actor:Actor {actorId: $actorId}), " +
+                String query = "MATCH (bacon:actor {actorId: $baconId}), (actor:actor {actorId: $actorId}), " +
                         "p = shortestPath((actor)-[:ACTED_IN*]-(bacon)) " +
                         "RETURN [n IN nodes(p) | coalesce(n.actorId, n.movieId)] AS baconPath";
 

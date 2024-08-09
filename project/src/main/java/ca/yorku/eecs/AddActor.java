@@ -51,7 +51,7 @@ public class AddActor implements HttpHandler {
 
         try (Transaction tx = Utils.driver.session().beginTransaction()) {
             // check if there is any data with the same actorId
-            StatementResult result = tx.run("MATCH (a:Actor {actorId: $actorId}) RETURN a",
+            StatementResult result = tx.run("MATCH (a:actor {actorId: $actorId}) RETURN a",
                     org.neo4j.driver.v1.Values.parameters("actorId", actorId));
 
             // check for duplicate entries
@@ -59,7 +59,7 @@ public class AddActor implements HttpHandler {
                 statusCode = 400;
             } else {
                 // make the query
-                tx.run("CREATE (a:Actor {name: $actorName, actorId: $actorId})",
+                tx.run("CREATE (a:actor {name: $actorName, actorId: $actorId})",
                         org.neo4j.driver.v1.Values.parameters("actorName", actorName, "actorId", actorId));
 
                 // commit the query for persistence

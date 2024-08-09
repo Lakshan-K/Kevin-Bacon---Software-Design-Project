@@ -49,7 +49,7 @@ public class AddMovie implements HttpHandler {
 
         try (Transaction tx = Utils.driver.session().beginTransaction()) {
             // check if there is any data with the same actorId
-            StatementResult result = tx.run("MATCH (m:Movie {movieId: $movieId}) RETURN m",
+            StatementResult result = tx.run("MATCH (m:movie {movieId: $movieId}) RETURN m",
                     org.neo4j.driver.v1.Values.parameters("movieId", movieId));
 
             // check for duplicate entries
@@ -57,7 +57,7 @@ public class AddMovie implements HttpHandler {
                 statusCode = 400;
             } else {
                 // make the query
-                tx.run("CREATE (m:Movie {name:$name, movieId:$movieId})",
+                tx.run("CREATE (m:movie {name:$name, movieId:$movieId})",
                         org.neo4j.driver.v1.Values.parameters("name", movieName, "movieId", movieId));
 
                 // commit the query for persistence
