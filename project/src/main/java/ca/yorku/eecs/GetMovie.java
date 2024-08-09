@@ -55,8 +55,8 @@ public class GetMovie implements HttpHandler {
         if (statusCode == 0) {
             try (Transaction tx = Utils.driver.session().beginTransaction()) {
                 // Query to find the movie by movieId and get its details
-                StatementResult result = tx.run("MATCH (m:movie {movieId: $movieId}) RETURN m.name AS name, " +
-                                "[ (m)<-[:ACTED_IN]-(a:Actor) | a.actorId ] AS actors",
+                StatementResult result = tx.run("MATCH (m:movie {id: $movieId}) RETURN m.Name AS name, " +
+                                "[ (m)<-[:ACTED_IN]-(a:Actor) | a.id ] AS actors",
                         org.neo4j.driver.v1.Values.parameters("movieId", movieId));
 
                 System.out.println("Query executed. Checking result...");

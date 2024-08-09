@@ -64,8 +64,8 @@ public class AddCoActorRelationship implements HttpHandler {
 
         if (statusCode == 0) {
             try (Transaction tx = Utils.driver.session().beginTransaction()) {
-                StatementResult result = tx.run("MATCH (a:actor {actorId: $actorId})\n" +
-                        "MATCH (b:actor {actorId: $coActorId})\n" +
+                StatementResult result = tx.run("MATCH (a:actor {id: $actorId})\n" +
+                        "MATCH (b:actor {id: $coActorId})\n" +
                         "RETURN a, b", org.neo4j.driver.v1.Values.parameters("actorId", actorId, "coActorId", coActorId));
 
                 // check if the result has value which indicates that the actorID and coActorID exists.
@@ -75,7 +75,7 @@ public class AddCoActorRelationship implements HttpHandler {
                 } else {
 
                     // check if there is any existing relationship between actorId and coActorId
-                    result = tx.run("MATCH (a:actor {actorId: $actorId})-[r:ACTED_WITH]->(b:actor {actorId: $coActorId}) " +
+                    result = tx.run("MATCH (a:actor {id: $actorId})-[r:ACTED_WITH]->(b:actor {id: $coActorId}) " +
                             "RETURN r", org.neo4j.driver.v1.Values.parameters("actorId", actorId, "coActorId", coActorId));
 
                     // check for duplicate entries
@@ -83,7 +83,7 @@ public class AddCoActorRelationship implements HttpHandler {
                         statusCode = 400;
                     } else {
                         // make the query
-                        tx.run("MATCH (a:actor {actorId: $actorId}), (b:actor {actorId: $coActorId}) " +
+                        tx.run("MATCH (a:actor {id: $actorId}), (b:actor {id: $coActorId}) " +
                                         "CREATE (a)-[r:ACTED_WITH]->(b)",
                                 org.neo4j.driver.v1.Values.parameters("actorId", actorId, "coActorId", coActorId));
 

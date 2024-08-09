@@ -63,8 +63,8 @@ public class GetActor implements HttpHandler {
             // Start a transaction to query the database
             try (Transaction tx = Utils.driver.session().beginTransaction()) {
                 // Query to find the actor by actorId and get their details
-                StatementResult result = tx.run("MATCH (a:actor {actorId: $actorId}) RETURN a.name AS name, " +
-                                "[ (a)-[:ACTED_IN]->(m:Movie) | m.movieId ] AS movies",
+                StatementResult result = tx.run("MATCH (a:actor {id: $actorId}) RETURN a.name AS name, " +
+                                "[ (a)-[:ACTED_IN]->(m:Movie) | m.id ] AS movies",
                         org.neo4j.driver.v1.Values.parameters("actorId", actorId));
 
                 System.out.println("Query executed. Checking result...");

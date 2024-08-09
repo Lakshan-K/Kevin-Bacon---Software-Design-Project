@@ -53,9 +53,9 @@ public class ComputeBaconPath implements HttpHandler {
 
         if (statusCode == 0) {
             try (Transaction tx = Utils.driver.session().beginTransaction()) {
-                String query = "MATCH (bacon:actor {actorId: $baconId}), (actor:actor {actorId: $actorId}), " +
+                String query = "MATCH (bacon:actor {id: $baconId}), (actor:actor {id: $actorId}), " +
                         "p = shortestPath((actor)-[:ACTED_IN*]-(bacon)) " +
-                        "RETURN [n IN nodes(p) | coalesce(n.actorId, n.movieId)] AS baconPath";
+                        "RETURN [n IN nodes(p) | coalesce(n.id, n.id)] AS baconPath";
 
                 StatementResult result = tx.run(query, org.neo4j.driver.v1.Values.parameters(
                         "actorId", actorId,

@@ -61,8 +61,8 @@ public class AddDirectorRelationship implements HttpHandler {
 
             try (Transaction tx = Utils.driver.session().beginTransaction()) {
 
-                StatementResult result = tx.run("MATCH (d:director {directorId: $directorId})\n" +
-                        "MATCH (m:movie {movieId: $movieId})\n" +
+                StatementResult result = tx.run("MATCH (d:director {id: $directorId})\n" +
+                        "MATCH (m:movie {id: $movieId})\n" +
                         "RETURN d, m", org.neo4j.driver.v1.Values.parameters("directorId", directorId, "movieId", movieId));
 
                 // check if the result has value which indicates that the actorID and movieID exists.
@@ -71,7 +71,7 @@ public class AddDirectorRelationship implements HttpHandler {
                     statusCode = 404;
                 } else {
                     // check if there is any existing relationship between directorId and movieId
-                    result = tx.run("MATCH (d:director {directorId: $directorId})-[r:DIRECTED]->(m:movie {movieId: $movieId}) " +
+                    result = tx.run("MATCH (d:director {id: $directorId})-[r:DIRECTED]->(m:movie {id: $movieId}) " +
                             "RETURN r", org.neo4j.driver.v1.Values.parameters("directorId", directorId, "movieId", movieId));
 
                     // check for duplicate entries
@@ -79,7 +79,7 @@ public class AddDirectorRelationship implements HttpHandler {
                         statusCode = 400;
                     } else {
                         // make the query
-                        tx.run("MATCH (d:director {directorId: $directorId}), (m:movie {movieId: $movieId}) " +
+                        tx.run("MATCH (d:director {id: $directorId}), (m:movie {id: $movieId}) " +
                                         "CREATE (d)-[r:DIRECTED]->(m)",
                                 org.neo4j.driver.v1.Values.parameters("directorId", directorId, "movieId", movieId));
 

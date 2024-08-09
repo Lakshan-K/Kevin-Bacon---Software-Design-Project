@@ -50,7 +50,7 @@ public class AddDirector implements HttpHandler {
 
         try (Transaction tx = Utils.driver.session().beginTransaction()) {
             // check if there is any data with the same directorId
-            StatementResult result = tx.run("MATCH (d:director {directorId: $directorId}) RETURN d",
+            StatementResult result = tx.run("MATCH (d:director {id: $directorId}) RETURN d",
                     org.neo4j.driver.v1.Values.parameters("directorId", directorId));
 
             // check for duplicate entries
@@ -58,7 +58,7 @@ public class AddDirector implements HttpHandler {
                 statusCode = 400;
             } else {
                 // make the query
-                tx.run("CREATE (d:director {name: $directorName, directorId: $directorId})",
+                tx.run("CREATE (d:director {Name: $directorName, id: $directorId})",
                         org.neo4j.driver.v1.Values.parameters("directorName", directorName, "directorId", directorId));
 
                 // commit the query for persistence

@@ -63,8 +63,8 @@ public class GetAward implements HttpHandler {
             // Begin a transaction to query the Neo4j database
             try (Transaction tx = Utils.driver.session().beginTransaction()) {
                 // Query to find the award by awardName and return its name and the list of actors who won it
-                StatementResult result = tx.run("MATCH (a:actor)-[:HAS_AWARD]->(aw:award {name: $awardName}) " +
-                                "RETURN aw.name AS awardName, collect({name: a.name, actorId: a.actorId}) AS actors",
+                StatementResult result = tx.run("MATCH (a:actor)-[:HAS_AWARD]->(aw:award {Name: $awardName}) " +
+                                "RETURN aw.Name AS awardName, collect({name: a.Name, actorId: a.id}) AS actors",
                         org.neo4j.driver.v1.Values.parameters("awardName", awardName));
 
                 System.out.println("Query executed. Checking result...");
