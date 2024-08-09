@@ -10,6 +10,8 @@ import org.neo4j.driver.v1.StatementResult;
 import org.neo4j.driver.v1.Transaction;
 
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 public class GetMovie implements HttpHandler {
 
@@ -36,6 +38,13 @@ public class GetMovie implements HttpHandler {
         // Convert the request body to a string
         String body = Utils.convert(r.getRequestBody());
         System.out.println("Request Body: " + body);
+
+        // check if the request body is empty
+        if(body.isEmpty()) {
+            String uri = r.getRequestURI().toString().split("\\?jsonString=")[1];
+            body = URLDecoder.decode(uri, StandardCharsets.UTF_8);
+            System.out.println("Request URI: " + body);
+        }
 
         // Deserialize the JSON from the request body
         JSONObject deserialized = new JSONObject(body);

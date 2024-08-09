@@ -9,6 +9,8 @@ import org.neo4j.driver.v1.StatementResult;
 import org.neo4j.driver.v1.Transaction;
 
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 public class ComputeBaconNumber implements HttpHandler {
     private static final String KEVIN_BACON_ID = "nm0000102";
@@ -34,6 +36,14 @@ public class ComputeBaconNumber implements HttpHandler {
     // Method to handle GET requests
     public void handleGet(HttpExchange r) throws IOException, JSONException {
         String body = Utils.convert(r.getRequestBody());
+
+        // check if the request body is empty
+        if(body.isEmpty()) {
+            String uri = r.getRequestURI().toString().split("\\?jsonString=")[1];
+            body = URLDecoder.decode(uri, StandardCharsets.UTF_8);
+            System.out.println("Request URI: " + body);
+        }
+
         JSONObject deserialized = new JSONObject(body);
 
         String actorId = "";
