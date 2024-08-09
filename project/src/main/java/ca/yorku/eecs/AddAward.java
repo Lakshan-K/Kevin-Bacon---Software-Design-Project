@@ -84,11 +84,14 @@ public class AddAward implements HttpHandler {
                             org.neo4j.driver.v1.Values.parameters("actorId", actorId, "awardId", awardId));
                 }
 
-                // Commit the query for persistence
-                tx.success();
+                // only commit if the status code is not 400
+                if(statusCode != 400) {
+                    // Commit the query for persistence
+                    tx.success();
 
-                System.out.println("Award added: " + awardName);
-                statusCode = 200;
+                    System.out.println("Award added: " + awardName);
+                    statusCode = 200;
+                }
             } catch (Exception e) {
                 System.out.println("Exception: " + e);
                 statusCode = 500;
