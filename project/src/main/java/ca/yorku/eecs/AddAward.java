@@ -79,7 +79,7 @@ public class AddAward implements HttpHandler {
                             org.neo4j.driver.v1.Values.parameters("awardName", awardName, "awardId", awardId));
 
                     // Create the relationship between the actor and the award
-                    tx.run("MATCH (a:actor {id: $actorId}), (w:Award {id: $awardId}) " +
+                    tx.run("MATCH (a:actor {id: $actorId}), (w:award {id: $awardId}) " +
                                     "MERGE (a)-[:HAS_AWARD]->(w)",
                             org.neo4j.driver.v1.Values.parameters("actorId", actorId, "awardId", awardId));
                 }

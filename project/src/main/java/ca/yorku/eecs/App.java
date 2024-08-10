@@ -47,7 +47,7 @@ public class App {
         server.createContext("/api/v1/getAward", new GetAward());
 
         // Registering the context for HasRelationship handler
-        server.createContext("/api/v1/HasRelationship", new HasRelationship());
+        server.createContext("/api/v1/hasRelationship", new HasRelationship());
 
         // Registering the context for ComputeBaconNumber handler
         server.createContext("/api/v1/computeBaconNumber", new ComputeBaconNumber());

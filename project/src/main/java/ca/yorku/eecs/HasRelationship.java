@@ -13,7 +13,7 @@ import java.net.URLDecoder;
 public class HasRelationship implements HttpHandler {
 
     public HasRelationship() {
-        System.out.println("GetMovie handler initialized");
+        System.out.println("HasRelationship handler initialized");
     }
 
     // Handle method to manage incoming HTTP requests
