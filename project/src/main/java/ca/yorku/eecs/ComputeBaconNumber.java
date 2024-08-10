@@ -60,15 +60,30 @@ public class ComputeBaconNumber implements HttpHandler {
                         "p = shortestPath((actor)-[:ACTED_IN*]-(bacon)) " +
                         "RETURN length(p)/2 AS baconNumber";
 
-                StatementResult result = tx.run(query, org.neo4j.driver.v1.Values.parameters(
-                        "actorId", actorId,
-                        "baconId", KEVIN_BACON_ID
-                ));
+                int baconNumber = 0;
 
-                if (result.hasNext()) {
-                    Record record = result.next();
-                    int baconNumber = record.get("baconNumber").asInt();
+                if(!actorId.equalsIgnoreCase(KEVIN_BACON_ID)) {
+                    StatementResult result = tx.run(query, org.neo4j.driver.v1.Values.parameters(
+                            "actorId", actorId,
+                            "baconId", KEVIN_BACON_ID
+                    ));
 
+                    if (result.hasNext()) {
+                        Record record = result.next();
+                        baconNumber = record.get("baconNumber").asInt();
+
+                        JSONObject response = new JSONObject();
+                        response.put("baconNumber", baconNumber);
+
+                        r.getResponseHeaders().add("Content-Type", "application/json");
+                        r.sendResponseHeaders(200, response.toString().getBytes().length);
+                        r.getResponseBody().write(response.toString().getBytes());
+                        r.getResponseBody().close();
+                        return;
+                    } else {
+                        statusCode = 404;  // Not Found
+                    }
+                } else {
                     JSONObject response = new JSONObject();
                     response.put("baconNumber", baconNumber);
 
@@ -77,9 +92,8 @@ public class ComputeBaconNumber implements HttpHandler {
                     r.getResponseBody().write(response.toString().getBytes());
                     r.getResponseBody().close();
                     return;
-                } else {
-                    statusCode = 404;  // Not Found
                 }
+
 
                 tx.success();
             } catch (Exception e) {
